@@ -1,0 +1,70 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #2E7D32;
+  position: relative;
+}
+
+/* Left & Right container */
+.nav-left,
+.nav-right {
+  display: flex;
+  gap: 10px;
+}
+
+/* Base Button Style */
+.nav-btn {
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6D4C41;
+  background-color: #F5F5DC;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+/* Smooth Hover Animation */
+.nav-btn:hover {
+  background-color: #4CAF50;
+  color: white;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
+}
+
+/* Active click effect */
+.nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Primary Button */
+.primary-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #43A047;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+}
+
+/* Cart Highlight */
+.cart-btn {
+  border: 1px solid #4CAF50;
+}
+
+/* Center Logo */
+.nav-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-logo {
+  height: 350px;   /* ✅ FIXED */
+  cursor: pointer;
+}
