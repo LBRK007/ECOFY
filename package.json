@@ -1,4 +1,5 @@
 {
+  "homepage": "https://LBRK007.github.io/ECOFY",
   "name": "ecofy",
   "version": "0.1.0",
   "private": true,
@@ -9,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "firebase": "^12.9.0",
     "framer-motion": "^12.34.3",
+    "gh-pages": "^6.3.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
@@ -16,11 +18,13 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d build"
+}
   "eslintConfig": {
     "extends": [
       "react-app",
