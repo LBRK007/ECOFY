@@ -9,12 +9,12 @@ import { getAuth } from "firebase/auth";
 
 // Your Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAiN5VyUnqxRzedlMZbthqEASSU0TNBG0M",
-  authDomain: "ecofy-732f2.firebaseapp.com",
-  projectId: "ecofy-732f2",
-  storageBucket: "ecofy-732f2.firebasestorage.app",
-  messagingSenderId: "929059068325",
-  appId: "1:929059068325:web:988057e76dd281fec7704c"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
