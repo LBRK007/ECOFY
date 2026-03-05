@@ -8,6 +8,10 @@ import Register from "./pages/Register";
 import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
 import AdminProducts from "./pages/AdminProducts";
+import ProductDetails from "./pages/ProductDetails";
+import CompletedOrders from "./pages/CompletedOrders";
+import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -15,13 +19,61 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/adminproducts" element={<AdminProducts />} />
+
+        {/* 🔐 Protected User Route */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 🔐 Protected Admin Routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/adminproducts"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminProducts />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/completed-orders"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <CompletedOrders />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </AnimatePresence>
   );

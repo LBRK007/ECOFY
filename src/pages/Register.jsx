@@ -1,24 +1,40 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";   // ✅ import db here
+import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
-import "./Register.css";
 import { motion } from "framer-motion";
+import "./Register.css";
 
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const user = userCredential.user;
+
+      // 🔐 Save user in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        role: user.email === "irfanmk@gmail.com" ? "admin" : "user",
+        createdAt: new Date()
+      });
+
       alert("Account Created Successfully 🌿");
       navigate("/");
+
     } catch (err) {
       setError(err.message);
     }
@@ -28,8 +44,7 @@ function Register() {
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -40 }}
-      transition={{ duration: 0.4, ease: "easeInOut" }}
+      transition={{ duration: 0.4 }}
       className="register-container"
     >
       <div className="register-card">
@@ -57,7 +72,7 @@ function Register() {
           <button type="submit">Register</button>
         </form>
 
-        <p>
+        <p style={{ marginTop: "15px" }}>
           Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>

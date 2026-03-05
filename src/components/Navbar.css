@@ -68,3 +68,59 @@
   height: 350px;   /* ✅ FIXED */
   cursor: pointer;
 }
+
+/* Account Dropdown */
+.account-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  min-width: 160px;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f4f4f4;
+}
+
+/* Mobile Responsive Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .nav-left, .nav-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-center {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-btn {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .nav-logo {
+    width: 120px;
+    height: auto;
+  }
+}
