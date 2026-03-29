@@ -25,7 +25,8 @@ function Admin() {
   const navigate = useNavigate();
   const unsubscribeSnapshotRef      = useRef(null);
 
-  /* ── Real-time listener — fetches ALL orders ── */
+/* ── Auth guard + real-time listener ── */
+useEffect(() => {
   const subscribeToOrders = () => {
     if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
 
@@ -49,23 +50,21 @@ function Admin() {
     unsubscribeSnapshotRef.current = unsubscribe;
   };
 
-  /* ── Auth guard ── */
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      if (!currentUser) { navigate("/login"); return; }
-      if (currentUser.email !== ADMIN_EMAIL) {
-        toast("Access Denied", "error");
-        navigate("/");
-        return;
-      }
-      subscribeToOrders();
-    });
+  const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+    if (!currentUser) { navigate("/login"); return; }
+    if (currentUser.email !== ADMIN_EMAIL) {
+      toast("Access Denied", "error");
+      navigate("/");
+      return;
+    }
+    subscribeToOrders();
+  });
 
-    return () => {
-      unsubscribeAuth();
-      if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
-    };
-  }, [navigate, subscribeToOrders, toast]);
+  return () => {
+    unsubscribeAuth();
+    if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
+  };
+}, [navigate, toast]);
 
   /* ── Update order status ── */
   const handleStatusChange = async (orderId, newStatus) => {
