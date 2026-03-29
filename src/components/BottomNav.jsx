@@ -11,6 +11,7 @@ import {
   FiUserPlus,
   FiSettings,
   FiCheckCircle,
+  FiX,
 } from "react-icons/fi";
 import { CartContext } from "../context/CartContext";
 import { auth, db } from "../firebase";
@@ -19,24 +20,24 @@ import { doc, getDoc } from "firebase/firestore";
 import "./BottomNav.css";
 
 function BottomNav() {
-  const { cart } = useContext(CartContext);
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
+  const { cart }              = useContext(CartContext);
+  const [user, setUser]       = useState(null);
+  const [role, setRole]       = useState(null);
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  /* ── Auth + role (mirrors your Navbar.jsx exactly) ── */
+  /* ── Auth + role ── */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         try {
-          const docSnap = await getDoc(doc(db, "users", currentUser.uid));
-          if (docSnap.exists()) setRole(docSnap.data().role);
+          const snap = await getDoc(doc(db, "users", currentUser.uid));
+          if (snap.exists()) setRole(snap.data().role);
         } catch (err) {
           console.error("Role fetch error:", err);
         }
@@ -47,10 +48,8 @@ function BottomNav() {
     return () => unsubscribe();
   }, []);
 
-  /* Close More menu on route change */
-  useEffect(() => {
-    setMoreOpen(false);
-  }, [location.pathname]);
+  /* Close More sheet on route change */
+  useEffect(() => { setMoreOpen(false); }, [location.pathname]);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -60,44 +59,41 @@ function BottomNav() {
 
   const go = (path) => { navigate(path); setMoreOpen(false); };
 
-  /* Which path counts as "active" for each tab */
-  const isHome    = location.pathname === "/" || location.pathname === "/products" || location.pathname.startsWith("/products/");
-  const isProfile = location.pathname === "/profile";
-  const isCart    = location.pathname === "/cart";
-  const isAdmin   = location.pathname.startsWith("/admin") || location.pathname === "/completed-orders";
+  /* Active state helpers */
+  const isHome     = location.pathname === "/" || location.pathname === "/products" || location.pathname.startsWith("/products/");
+  const isCart     = location.pathname === "/cart";
+  const isProfile  = location.pathname === "/profile";
+  const isAdmin    = location.pathname.startsWith("/admin") || location.pathname === "/completed-orders";
 
   return (
     <>
-      {/* ── More menu backdrop ── */}
+      {/* ── Backdrop ── */}
       {moreOpen && (
-        <div
-          className="bn-backdrop"
-          onClick={() => setMoreOpen(false)}
-        />
+        <div className="bn-backdrop" onClick={() => setMoreOpen(false)} />
       )}
 
-      {/* ── More slide-up sheet ── */}
+      {/* ── Slide-up More sheet ── */}
       <div className={`bn-more-sheet ${moreOpen ? "open" : ""}`}>
         <div className="bn-sheet-handle" />
 
-        <p className="bn-sheet-title">More</p>
+        <p className="bn-sheet-title">More options</p>
 
         {role === "admin" && (
           <>
             <SheetRow
-              icon={<FiSettings size={18} />}
+              icon={<FiSettings size={17} />}
               label="Admin Dashboard"
               onClick={() => go("/admin")}
               active={location.pathname === "/admin"}
             />
             <SheetRow
-              icon={<FiPackage size={18} />}
+              icon={<FiPackage size={17} />}
               label="Manage Products"
               onClick={() => go("/adminproducts")}
               active={location.pathname === "/adminproducts"}
             />
             <SheetRow
-              icon={<FiCheckCircle size={18} />}
+              icon={<FiCheckCircle size={17} />}
               label="Completed Orders"
               onClick={() => go("/completed-orders")}
               active={location.pathname === "/completed-orders"}
@@ -108,7 +104,7 @@ function BottomNav() {
 
         {user ? (
           <SheetRow
-            icon={<FiLogOut size={18} />}
+            icon={<FiLogOut size={17} />}
             label="Logout"
             onClick={handleLogout}
             danger
@@ -116,14 +112,14 @@ function BottomNav() {
         ) : (
           <>
             <SheetRow
-              icon={<FiLogIn size={18} />}
+              icon={<FiLogIn size={17} />}
               label="Login"
               onClick={() => go("/login")}
               active={location.pathname === "/login"}
             />
             <SheetRow
-              icon={<FiUserPlus size={18} />}
-              label="Register"
+              icon={<FiUserPlus size={17} />}
+              label="Create account"
               onClick={() => go("/register")}
               active={location.pathname === "/register"}
             />
@@ -134,7 +130,7 @@ function BottomNav() {
       {/* ── Bottom nav bar ── */}
       <nav className="bottom-nav">
 
-        {/* Home tab — shows Admin if admin role */}
+        {/* Home / Admin tab */}
         <NavTab
           icon={role === "admin" ? <FiSettings size={22} /> : <FiHome size={22} />}
           label={role === "admin" ? "Admin" : "Home"}
@@ -142,7 +138,7 @@ function BottomNav() {
           onClick={() => go(role === "admin" ? "/admin" : "/")}
         />
 
-        {/* Products tab (only for non-admins) */}
+        {/* Products tab — non-admins only */}
         {role !== "admin" && (
           <NavTab
             icon={<FiPackage size={22} />}
@@ -177,7 +173,7 @@ function BottomNav() {
 
         {/* More tab */}
         <NavTab
-          icon={<FiMenu size={22} />}
+          icon={moreOpen ? <FiX size={22} /> : <FiMenu size={22} />}
           label="More"
           active={moreOpen}
           onClick={() => setMoreOpen((prev) => !prev)}

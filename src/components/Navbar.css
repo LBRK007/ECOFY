@@ -1,3 +1,7 @@
+/* ─────────────────────────────
+   NAVBAR BASE (DESKTOP)
+───────────────────────────── */
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -7,14 +11,14 @@
   position: relative;
 }
 
-/* Left & Right container */
+/* Left & Right */
 .nav-left,
 .nav-right {
   display: flex;
   gap: 10px;
 }
 
-/* Base Button Style */
+/* Buttons */
 .nav-btn {
   text-decoration: none;
   padding: 8px 18px;
@@ -24,40 +28,20 @@
   color: #6D4C41;
   background-color: #F5F5DC;
   transition: all 0.3s ease;
-  display: inline-block;
 }
 
-/* Smooth Hover Animation */
 .nav-btn:hover {
   background-color: #4CAF50;
   color: white;
   transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
 }
 
-/* Active click effect */
-.nav-btn:active {
-  transform: scale(0.95);
-}
-
-/* Primary Button */
-.primary-btn {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.primary-btn:hover {
-  background-color: #43A047;
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
-}
-
-/* Cart Highlight */
+/* Cart */
 .cart-btn {
   border: 1px solid #4CAF50;
 }
 
-/* Center Logo */
+/* CENTER LOGO */
 .nav-center {
   position: absolute;
   left: 50%;
@@ -65,19 +49,19 @@
 }
 
 .nav-logo {
-  height: 350px;   /* ✅ FIXED */
+  height: 365px;
   cursor: pointer;
 }
 
-/* Account Dropdown */
+/* DROPDOWN */
 .account-container {
   position: relative;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 32px;
-  right: 80px;
+  top: 30px;
+  right: 0px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.1);
@@ -94,34 +78,50 @@
   background-color: #f4f4f4;
 }
 
-/* Mobile Responsive Navbar */
+.logout {
+  color: #f44336;
+}
+
+/* ─────────────────────────────
+   MOBILE (LOGO ONLY)
+───────────────────────────── */
+
 @media (max-width: 768px) {
+
   .navbar {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px;
-  }
-
-  .nav-left, .nav-right {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .nav-center {
-    margin: 10px 0;
-    display: flex;
     justify-content: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
   }
 
-  .nav-btn {
-    padding: 8px 10px;
-    font-size: 14px;
+  /* ❌ Hide buttons */
+  .nav-left,
+  .nav-right {
+    display: none !important;
   }
 
+  /* ✅ Center logo */
+  .nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+  }
+
+  /* Smaller logo */
   .nav-logo {
-    width: 120px;
-    height: auto;
+    height: 205px;
+    cursor: pointer;
   }
 }
- 
+
+/*.nav-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-logo {
+  height: 365px;
+  cursor: pointer;
+}*/

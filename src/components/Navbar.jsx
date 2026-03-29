@@ -21,7 +21,7 @@ function Navbar() {
     0
   );
 
-  // 🔐 Auth + Role Fetch
+  // 🔐 Auth + Role
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -45,7 +45,6 @@ function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  // 🔓 Logout
   const handleLogout = async () => {
     await signOut(auth);
     setShowDropdown(false);
@@ -57,8 +56,6 @@ function Navbar() {
 
       {/* LEFT */}
       <div className="nav-left">
-
-        {/* 🔥 Admin or Home */}
         {role === "admin" ? (
           <Link to="/admin" className="nav-btn">Admin</Link>
         ) : (
@@ -70,13 +67,15 @@ function Navbar() {
 
       {/* CENTER LOGO */}
       <div className="nav-center">
-        <img src={logo} alt="ECOFY Logo" className="nav-logo" />
+        <Link to="/">
+          <img src={logo} alt="ECOFY Logo" className="nav-logo" />
+        </Link>
       </div>
 
       {/* RIGHT */}
       <div className="nav-right">
 
-        {/* ACCOUNT DROPDOWN */}
+        {/* Account */}
         <div
           className="account-container"
           onMouseEnter={() => setShowDropdown(true)}
@@ -88,7 +87,6 @@ function Navbar() {
 
           {showDropdown && (
             <div className="dropdown-menu">
-
               {user ? (
                 <>
                   <div
@@ -102,9 +100,8 @@ function Navbar() {
                   </div>
 
                   <div
-                    className="dropdown-item"
+                    className="dropdown-item logout"
                     onClick={handleLogout}
-                    style={{ color: "#f44336" }}
                   >
                     Logout
                   </div>
@@ -132,19 +129,17 @@ function Navbar() {
                   </div>
                 </>
               )}
-
             </div>
           )}
         </div>
 
-        {/* CART */}
+        {/* Cart */}
         <Link to="/cart" className="nav-btn cart-btn">
           Cart {totalItems > 0 && `(${totalItems})`}
         </Link>
 
       </div>
     </nav>
-    
   );
 }
 
