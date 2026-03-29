@@ -6,10 +6,12 @@ import {
   getDocs,
   deleteDoc,
   doc,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { ADMIN_EMAIL } from "../constants";   // FIX: shared constant
+import { useToast } from "../hooks/useToast";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -19,42 +21,28 @@ function AdminProducts() {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [imageFile, setImageFile] = useState(null);
-
   const [editingId, setEditingId] = useState(null);
 
+  const { toast, ToastContainer } = useToast();
   const navigate = useNavigate();
-  const ADMIN_EMAIL = "irfanmk@gmail.com";
 
-  /* ===============================
-     🔐 Admin Authentication
-  =============================== */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user || user.email !== ADMIN_EMAIL) {
-        alert("Access Denied ❌");
+        toast("Access Denied", "error");
         navigate("/");
         return;
       }
       fetchProducts();
     });
-
     return () => unsubscribe();
   }, [navigate]);
 
-  /* ===============================
-     📦 Fetch Products
-  =============================== */
   const fetchProducts = async () => {
     try {
       setLoading(true);
-
       const snapshot = await getDocs(collection(db, "products"));
-
-      const list = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
+      const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setProducts(list);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -63,99 +51,59 @@ function AdminProducts() {
     }
   };
 
-  /* ===============================
-     ☁️ Upload Image to Cloudinary
-  =============================== */
   const uploadImage = async () => {
     if (!imageFile) return null;
-
     const formData = new FormData();
     formData.append("file", imageFile);
     formData.append("upload_preset", "ecofy_upload");
 
     const response = await fetch(
       "https://api.cloudinary.com/v1_1/ddhewvyxh/image/upload",
-      {
-        method: "POST",
-        body: formData,
-      }
+      { method: "POST", body: formData }
     );
-
     const data = await response.json();
-
-    if (!data.secure_url) {
-      throw new Error("Image upload failed");
-    }
-
+    if (!data.secure_url) throw new Error("Image upload failed");
     return data.secure_url;
   };
 
-  /* ===============================
-     ➕ Add / ✏️ Update Product
-  =============================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!name || !price || !stock) {
-      alert("Please fill all required fields");
+      toast("Please fill all required fields", "warning");
       return;
     }
 
     try {
       let imageURL = null;
+      if (imageFile) imageURL = await uploadImage();
 
-      if (imageFile) {
-        imageURL = await uploadImage();
-      }
-
-      // ✏️ UPDATE MODE
       if (editingId) {
-        const productRef = doc(db, "products", editingId);
-
-        const updatedData = {
-          name,
-          price: Number(price),
-          stock: Number(stock),
-        };
-
-        if (imageURL) {
-          updatedData.image = imageURL;
-        }
-
-        await updateDoc(productRef, updatedData);
-
-        alert("Product updated ✅");
-      }
-
-      // ➕ ADD MODE
-      else {
+        const updatedData = { name, price: Number(price), stock: Number(stock) };
+        if (imageURL) updatedData.image = imageURL;
+        await updateDoc(doc(db, "products", editingId), updatedData);
+        toast("Product updated ✅", "success");
+      } else {
         if (!imageURL) {
-          alert("Please upload an image");
+          toast("Please upload an image", "warning");
           return;
         }
-
         await addDoc(collection(db, "products"), {
           name,
           price: Number(price),
           stock: Number(stock),
           image: imageURL,
         });
-
-        alert("Product added 🌿");
+        toast("Product added 🌿", "success");
       }
 
       resetForm();
       fetchProducts();
-
     } catch (error) {
       console.error("Submit error:", error);
-      alert("Something went wrong ❌");
+      toast("Something went wrong", "error");
     }
   };
 
-  /* ===============================
-     🧹 Reset Form
-  =============================== */
   const resetForm = () => {
     setName("");
     setPrice("");
@@ -164,29 +112,26 @@ function AdminProducts() {
     setEditingId(null);
   };
 
-  /* ===============================
-     ❌ Delete Product
-  =============================== */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product?")) return;
-
     try {
       await deleteDoc(doc(db, "products", id));
+      toast("Product deleted", "info");
       fetchProducts();
     } catch (error) {
       console.error("Delete error:", error);
+      toast("Failed to delete product", "error");
     }
   };
 
-  if (loading) {
-    return <div style={{ padding: "40px" }}>Loading...</div>;
-  }
+  if (loading) return <div style={{ padding: "40px" }}>Loading...</div>;
 
   return (
     <div style={{ padding: "40px" }}>
+      <ToastContainer />
       <h1>Admin Product Management 🌿</h1>
 
-      {/* ================= FORM ================= */}
+      {/* Form */}
       <form
         onSubmit={handleSubmit}
         style={{
@@ -203,27 +148,23 @@ function AdminProducts() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-
         <input
           type="number"
           placeholder="Price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
         />
-
         <input
           type="number"
           placeholder="Stock Quantity"
           value={stock}
           onChange={(e) => setStock(e.target.value)}
         />
-
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImageFile(e.target.files[0])}
         />
-
         <button
           type="submit"
           style={{
@@ -237,9 +178,25 @@ function AdminProducts() {
         >
           {editingId ? "Update Product" : "Add Product"}
         </button>
+        {editingId && (
+          <button
+            type="button"
+            onClick={resetForm}
+            style={{
+              padding: "10px",
+              backgroundColor: "#888",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            Cancel Edit
+          </button>
+        )}
       </form>
 
-      {/* ================= PRODUCTS GRID ================= */}
+      {/* Products Grid */}
       <div
         style={{
           display: "grid",
@@ -263,7 +220,6 @@ function AdminProducts() {
               alt={product.name}
               style={{ width: "100%", borderRadius: "8px" }}
             />
-
             <h4>{product.name}</h4>
             <p>₹ {product.price}</p>
             <p>Stock: {product.stock}</p>
@@ -288,7 +244,6 @@ function AdminProducts() {
             >
               Edit
             </button>
-
             <button
               onClick={() => handleDelete(product.id)}
               style={{

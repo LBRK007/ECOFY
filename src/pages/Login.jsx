@@ -1,11 +1,12 @@
 import { useState } from "react";
 import {
   signInWithEmailAndPassword,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ADMIN_EMAIL } from "../constants";
 import "./Login.css";
 
 function Login() {
@@ -14,7 +15,6 @@ function Login() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -25,14 +25,7 @@ function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-
-      // Admin check (temporary)
-      if (email === "irfanmk@gmail.com") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
-
+      navigate(email === ADMIN_EMAIL ? "/admin" : "/");
     } catch (err) {
       setError("Invalid email or password ❌");
     }
@@ -43,12 +36,10 @@ function Login() {
   const handleForgotPassword = async () => {
     setError("");
     setMessage("");
-
     if (!email) {
       setError("Enter your email first 📧");
       return;
     }
-
     try {
       await sendPasswordResetEmail(auth, email);
       setMessage("Password reset email sent ✅");
@@ -80,7 +71,6 @@ function Login() {
               required
             />
           </div>
-
           <div className="input-group">
             <input
               type="password"
@@ -90,19 +80,13 @@ function Login() {
               required
             />
           </div>
-
           <button type="submit" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
         <p
-          style={{
-            fontSize: "14px",
-            marginTop: "10px",
-            cursor: "pointer",
-            color: "#4CAF50"
-          }}
+          style={{ fontSize: "14px", marginTop: "10px", cursor: "pointer", color: "#4CAF50" }}
           onClick={handleForgotPassword}
         >
           Forgot Password?
