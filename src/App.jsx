@@ -84,6 +84,7 @@ function App() {
     <Router>
       <Navbar />
       <AnimatedRoutes />
+      <BottomNav />
     </Router>
   );
 }

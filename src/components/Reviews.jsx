@@ -74,52 +74,52 @@ function Reviews({ productId, onStatsChange }) {
     });
 
     return () => unsub();
-  }, [productId]);
+  }, [productId, onStatsChange]);
 
   /* ── Check if logged-in user already reviewed & if they're eligible ── */
   useEffect(() => {
-    if (!user || !productId) {
-      setCheckingEligibility(false);
-      return;
-    }
+  if (!user || !productId) {
+    setCheckingEligibility(false);
+    return;
+  }
 
-    const checkEligibility = async () => {
-      setCheckingEligibility(true);
-      try {
-        // 1. Has user already reviewed this product?
-        const existingQ = query(
-          collection(db, "reviews"),
-          where("productId", "==", productId),
-          where("userId", "==", user.uid)
-        );
-        const existingSnap = await getDocs(existingQ);
-        if (!existingSnap.empty) {
-          const existing = existingSnap.docs[0];
-          setMyReview(existing.data());
-          setMyReviewDocId(existing.id);
-          setRating(existing.data().rating);
-          setComment(existing.data().comment);
-        }
+  const checkEligibility = async () => {
+    setCheckingEligibility(true);
+    try {
+      const existingQ = query(
+        collection(db, "reviews"),
+        where("productId", "==", productId),
+        where("userId", "==", user.uid)
+      );
+      const existingSnap = await getDocs(existingQ);
 
-        // 2. Does user have a Delivered order containing this product?
-        const ordersQ = query(
-          collection(db, "orders"),
-          where("userId", "==", user.uid),
-          where("status", "==", "Delivered")
-        );
-        const ordersSnap = await getDocs(ordersQ);
-        const purchased = ordersSnap.docs.some((orderDoc) =>
-          (orderDoc.data().items || []).some((item) => item.id === productId)
-        );
-        setCanReview(purchased);
-      } catch (err) {
-        console.error("Eligibility check error:", err);
+      if (!existingSnap.empty) {
+        const existing = existingSnap.docs[0];
+        setMyReview(existing.data());
+        setMyReviewDocId(existing.id);
+        setRating(existing.data().rating);
+        setComment(existing.data().comment);
       }
-      setCheckingEligibility(false);
-    };
 
-    checkEligibility();
-  }, [user, productId]);
+      const ordersQ = query(
+        collection(db, "orders"),
+        where("userId", "==", user.uid),
+        where("status", "==", "Delivered")
+      );
+      const ordersSnap = await getDocs(ordersQ);
+      const purchased = ordersSnap.docs.some((orderDoc) =>
+        (orderDoc.data().items || []).some((item) => item.id === productId)
+      );
+      setCanReview(purchased);
+    } catch (err) {
+      console.error("Eligibility check error:", err);
+    }
+    setCheckingEligibility(false);
+  };
+
+  checkEligibility();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, productId]);
 
   /* ── Submit / update review ── */
   const handleSubmit = async () => {
@@ -174,12 +174,12 @@ function Reviews({ productId, onStatsChange }) {
       {!user ? (
         <div style={styles.gateBox}>
           <p style={{ margin: "0 0 10px", color: "#555" }}>
-            <a
+            <button
               onClick={() => navigate("/login")}
               style={{ color: "#2E7D32", cursor: "pointer", fontWeight: "500" }}
             >
               Log in
-            </a>{" "}
+            </button>{" "}
             to leave a review.
           </p>
         </div>

@@ -9,8 +9,7 @@ import {
   orderBy,
   doc,
   updateDoc,
-  getDoc,
-  getDocs,
+  getDoc
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
