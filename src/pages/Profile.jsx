@@ -32,7 +32,7 @@ function Profile() {
   const [wishlistProducts, setWishlistProducts] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(false);
 
-  const { wishlist, toggleWishlist } = useWishlist();
+  const { wishlist, } = useWishlist();
   const { addToCart } = useContext(CartContext);
   const { toast, ToastContainer } = useToast();
   const navigate = useNavigate();
@@ -40,54 +40,57 @@ function Profile() {
   const unsubscribeSnapshotRef = useRef(null);
   const isFirstSnapshotRef = useRef(true);
 
-  /* ── Auth + live orders ── */
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      if (!currentUser) { navigate("/login"); return; }
-      setUser(currentUser);
-      isFirstSnapshotRef.current = true;
+/* ── Auth + live orders ── */
+useEffect(() => {
+  const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+    if (!currentUser) { 
+      navigate("/login"); 
+      return; 
+    }
+    setUser(currentUser);
+    isFirstSnapshotRef.current = true;
 
-      if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
+    if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
 
-      const q = query(
-        collection(db, "orders"),
-        where("userId", "==", currentUser.uid),
-        orderBy("createdAt", "desc")
-      );
+    const q = query(
+      collection(db, "orders"),
+      where("userId", "==", currentUser.uid),
+      orderBy("createdAt", "desc")
+    );
 
-      const unsub = onSnapshot(q, (snapshot) => {
-        const updated = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const unsub = onSnapshot(q, (snapshot) => {
+      const updated = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-        if (!isFirstSnapshotRef.current) {
-          updated.forEach((order) => {
-            const prev = prevStatuses[order.id];
-            if (prev && prev !== order.status) {
-              const messages = {
-                Shipped:   "Your order has been shipped! 🚚",
-                Delivered: "Your order has been delivered! 🎉",
-                Cancelled: "Your order has been cancelled.",
-              };
-              const msg = messages[order.status];
-              if (msg) toast(msg, order.status === "Cancelled" ? "warning" : "success");
-            }
-          });
-        }
+      if (!isFirstSnapshotRef.current) {
+        updated.forEach((order) => {
+          const prev = prevStatuses[order.id]; // ← used from state
+          if (prev && prev !== order.status) {
+            const messages = {
+              Shipped:   "Your order has been shipped! 🚚",
+              Delivered: "Your order has been delivered! 🎉",
+              Cancelled: "Your order has been cancelled.",
+            };
+            const msg = messages[order.status];
+            if (msg) toast(msg, order.status === "Cancelled" ? "warning" : "success");
+          }
+        });
+      }
 
-        const statusMap = {};
-        updated.forEach((o) => { statusMap[o.id] = o.status; });
-        setPrevStatuses(statusMap);
-        setOrders(updated);
-        isFirstSnapshotRef.current = false;
-      });
-
-      unsubscribeSnapshotRef.current = unsub;
+      const statusMap = {};
+      updated.forEach((o) => { statusMap[o.id] = o.status; });
+      setPrevStatuses(statusMap);
+      setOrders(updated);
+      isFirstSnapshotRef.current = false;
     });
 
-    return () => {
-      unsubscribeAuth();
-      if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
-    };
-  }, [navigate]);
+    unsubscribeSnapshotRef.current = unsub;
+  });
+
+  return () => {
+    unsubscribeAuth();
+    if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
+  };
+}, [navigate, toast, prevStatuses]); 
 
   /* ── Fetch full product details whenever wishlist changes ── */
   useEffect(() => {

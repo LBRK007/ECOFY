@@ -36,7 +36,7 @@ function AdminProducts() {
       fetchProducts();
     });
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const fetchProducts = async () => {
     try {

@@ -65,7 +65,7 @@ function Admin() {
       unsubscribeAuth();
       if (unsubscribeSnapshotRef.current) unsubscribeSnapshotRef.current();
     };
-  }, [navigate]);
+  }, [navigate, subscribeToOrders, toast]);
 
   /* ── Update order status ── */
   const handleStatusChange = async (orderId, newStatus) => {
