@@ -77,7 +77,7 @@ function SubscribeModal({ onClose }) {
   const validate = () => {
     const e = {};
     if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) e.email = 'Please enter a valid email address.';
-    if (!form.phone.match(/^\+?[0-9\s\-]{7,15}$/))       e.phone = 'Please enter a valid phone number.';
+    if (!form.phone.match(/^\+?[0-9\s-]{7,15}$/))        e.phone = 'Please enter a valid phone number.';
     if (!form.age || form.age < 1 || form.age > 120)      e.age   = 'Please enter a valid age (1–120).';
     return e;
   };
