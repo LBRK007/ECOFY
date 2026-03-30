@@ -7,7 +7,7 @@
   --nav-border:    rgba(168, 213, 181, 0.15);
   --nav-btn-bg:    rgba(255, 255, 255, 0.10);
   --nav-btn-hover: rgba(255, 255, 255, 0.18);
-  --nav-text:      rgba(255, 255, 255, 0.88);
+  --nav-text:      rgba(0, 0, 0, 0.88);
   --nav-accent:    #a8d5b5;
   --nav-height:    68px;
 }
@@ -164,5 +164,10 @@
     transform: translateX(-50%);
   }
 
-  .nav-logo { height: 40px; }
+.nav-logo {
+  height: 350px;
+  width: auto;
+  cursor: pointer;
+
+}
 }
