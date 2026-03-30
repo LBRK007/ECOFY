@@ -13,6 +13,8 @@ import ProductDetails from "./pages/ProductDetails";
 import CompletedOrders from "./pages/CompletedOrders";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Footer from "./components/Footer";
+
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -83,8 +85,11 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <AnimatedRoutes />
+      <main style={{ paddingTop: '70px' }}>
+        <AnimatedRoutes />
+      </main>
       <BottomNav />
+      <Footer />
     </Router>
   );
 }

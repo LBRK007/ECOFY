@@ -9,39 +9,36 @@ import { doc, getDoc } from "firebase/firestore";
 
 function Navbar() {
   const { cart } = useContext(CartContext);
-
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
+  const [user, setUser]               = useState(null);
+  const [role, setRole]               = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
-
+  const [scrolled, setScrolled]       = useState(false);
   const navigate = useNavigate();
 
-  const totalItems = cart.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // 🔐 Auth + Role
+  /* ── Scroll-aware glass effect ── */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* ── Auth + Role ── */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-
       if (currentUser) {
         try {
-          const docRef = doc(db, "users", currentUser.uid);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            setRole(docSnap.data().role);
-          }
-        } catch (error) {
-          console.error("Error fetching role:", error);
+          const snap = await getDoc(doc(db, "users", currentUser.uid));
+          if (snap.exists()) setRole(snap.data().role);
+        } catch (err) {
+          console.error("Role fetch error:", err);
         }
       } else {
         setRole(null);
       }
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -52,80 +49,56 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
 
-      {/* LEFT */}
+      {/* ── LEFT ── */}
       <div className="nav-left">
         {role === "admin" ? (
           <Link to="/admin" className="nav-btn">Admin</Link>
         ) : (
           <Link to="/" className="nav-btn">Home</Link>
         )}
-
         <Link to="/products" className="nav-btn">Products</Link>
       </div>
 
-      {/* CENTER LOGO */}
+      {/* ── CENTER LOGO ── */}
       <div className="nav-center">
         <Link to="/">
-          <img src={logo} alt="ECOFY Logo" className="nav-logo" />
+          <img src={logo} alt="ECOFY" className="nav-logo" />
         </Link>
       </div>
 
-      {/* RIGHT */}
+      {/* ── RIGHT ── */}
       <div className="nav-right">
 
-        {/* Account */}
+        {/* Account dropdown */}
         <div
           className="account-container"
           onMouseEnter={() => setShowDropdown(true)}
           onMouseLeave={() => setShowDropdown(false)}
         >
           <button className="nav-btn">
-            {user ? "Account" : "Login"}
+            {user ? `👤 Account` : `🔑 Login`}
           </button>
 
           {showDropdown && (
             <div className="dropdown-menu">
               {user ? (
                 <>
-                  <div
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigate("/profile");
-                      setShowDropdown(false);
-                    }}
-                  >
-                    My Profile
+                  <div className="dropdown-item" onClick={() => { navigate("/profile"); setShowDropdown(false); }}>
+                    👤 My Profile
                   </div>
-
-                  <div
-                    className="dropdown-item logout"
-                    onClick={handleLogout}
-                  >
-                    Logout
+                  <div className="dropdown-item logout" onClick={handleLogout}>
+                    🚪 Logout
                   </div>
                 </>
               ) : (
                 <>
-                  <div
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigate("/login");
-                      setShowDropdown(false);
-                    }}
-                  >
-                    Login
+                  <div className="dropdown-item" onClick={() => { navigate("/login"); setShowDropdown(false); }}>
+                    🔑 Login
                   </div>
-
-                  <div
-                    className="dropdown-item"
-                    onClick={() => {
-                      navigate("/register");
-                      setShowDropdown(false);
-                    }}
-                  >
-                    Register
+                  <div className="dropdown-item" onClick={() => { navigate("/register"); setShowDropdown(false); }}>
+                    🌱 Register
                   </div>
                 </>
               )}
@@ -133,12 +106,14 @@ function Navbar() {
           )}
         </div>
 
-        {/* Cart */}
-        <Link to="/cart" className="nav-btn cart-btn">
-          Cart {totalItems > 0 && `(${totalItems})`}
-        </Link>
-
+        {/* Cart — logged-in non-admin only */}
+        {user && role !== "admin" && (
+          <Link to="/cart" className="nav-btn cart-btn">
+            🧺 Cart {totalItems > 0 && `(${totalItems})`}
+          </Link>
+        )}
       </div>
+
     </nav>
   );
 }
