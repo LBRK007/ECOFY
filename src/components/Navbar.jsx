@@ -6,6 +6,9 @@ import logo from "../assets/logo.png";
 import { auth, db } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { FaCartArrowDown,    } from "react-icons/fa";
+import {  RiAccountCircleLine  } from "react-icons/ri"
+import {  CiLogout   } from "react-icons/ci"
 
 function Navbar() {
   const { cart } = useContext(CartContext);
@@ -63,9 +66,11 @@ function Navbar() {
 
       {/* ── CENTER LOGO ── */}
       <div className="nav-center">
-        <Link to="/">
-          <img src={logo} alt="ECOFY" className="nav-logo" />
-        </Link>
+        <div className="logo-click-area">
+          <Link to="/">
+            <img src={logo} alt="ECOFY" className="nav-logo" />
+          </Link>
+        </div>
       </div>
 
       {/* ── RIGHT ── */}
@@ -78,27 +83,31 @@ function Navbar() {
           onMouseLeave={() => setShowDropdown(false)}
         >
           <button className="nav-btn">
-            {user ? `👤 Account` : `🔑 Login`}
+            <RiAccountCircleLine    className="account-icon" />
+            {user ? ` Account` : `Login`}
           </button>
 
           {showDropdown && (
             <div className="dropdown-menu">
               {user ? (
                 <>
-                  <div className="dropdown-item" onClick={() => { navigate("/profile"); setShowDropdown(false); }}>
-                    👤 My Profile
-                  </div>
-                  <div className="dropdown-item logout" onClick={handleLogout}>
-                    🚪 Logout
-                  </div>
+          <div
+            className="dropdown-item"
+            onClick={() => { navigate("/profile"); setShowDropdown(false); }}
+          >
+            <RiAccountCircleLine className="icon" /> My Profile
+          </div>
+        <div className="dropdown-item logout" onClick={handleLogout}>
+          <CiLogout className="icon" /> Logout
+        </div>
                 </>
               ) : (
                 <>
                   <div className="dropdown-item" onClick={() => { navigate("/login"); setShowDropdown(false); }}>
-                    🔑 Login
+                    Login
                   </div>
                   <div className="dropdown-item" onClick={() => { navigate("/register"); setShowDropdown(false); }}>
-                    🌱 Register
+                    Register
                   </div>
                 </>
               )}
@@ -109,7 +118,8 @@ function Navbar() {
         {/* Cart — logged-in non-admin only */}
         {user && role !== "admin" && (
           <Link to="/cart" className="nav-btn cart-btn">
-            🧺 Cart {totalItems > 0 && `(${totalItems})`}
+            <FaCartArrowDown className="cart-icon" />
+            {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
           </Link>
         )}
       </div>

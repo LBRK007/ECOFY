@@ -1,80 +1,109 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";   // ✅ import db here
+import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ADMIN_EMAIL } from "../constants";
 import "./Register.css";
 
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
+    setLoading(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 🔐 Save user in Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
-        role: user.email === "irfanmk@gmail.com" ? "admin" : "user",
+        role: user.email === ADMIN_EMAIL ? "admin" : "user",
         createdAt: new Date()
       });
 
-      alert("Account Created Successfully 🌿");
-      navigate("/");
+      setMessage("Account created successfully ✅");
+      setTimeout(() => navigate("/"), 1200);
 
     } catch (err) {
       setError(err.message);
     }
+
+    setLoading(false);
   };
 
   return (
     <motion.div
+      className="register-container"
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="register-container"
     >
+      {/* Decorative leaves */}
+      <span className="register-leaf">🌿</span>
+      <span className="register-leaf">🎋</span>
+      <span className="register-leaf">🍃</span>
+
       <div className="register-card">
-        <h2>Create ECOFY Account 🌿</h2>
 
-        {error && <p className="error">{error}</p>}
+        {/* Top Bar */}
+        <div className="register-card-top">
+          <div className="register-logo">🌿</div>
+          <h1 className="register-title">Create Account</h1>
+          <p className="register-subtitle">Sign up for your ECOFY account</p>
+        </div>
 
-        <form onSubmit={handleRegister}>
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        {/* Form Body */}
+        <div className="register-body">
+          {error && <div className="register-error">❌ {error}</div>}
+          {message && <div className="register-success">✅ {message}</div>}
 
-          <input
-            type="password"
-            placeholder="Create Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <form onSubmit={handleRegister}>
+            <div className="register-field">
+              <label className="register-label">Email Address</label>
+              <input
+                className="register-input"
+                type="email"
+                placeholder="you@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-          <button type="submit">Register</button>
-        </form>
+            <div className="register-field">
+              <label className="register-label">Password</label>
+              <input
+                className="register-input"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-        <p style={{ marginTop: "15px" }}>
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
+            <div className="register-btn-wrap">
+              <button type="submit" className="register-btn" disabled={loading}>
+                {loading ? "🌿 Creating Account..." : "Register"}
+              </button>
+            </div>
+          </form>
+
+          <div className="register-login">
+            Already have an account? <Link to="/login">Login</Link>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

@@ -1,74 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+:root {
+  --gd: #1a3a2a;
+  --gm: #2d5a3d;
+  --gf: #4a8c5c;
+  --gl: #a8d5b5;
+  --gp: #e8f5ec;
+  --cr: #faf6f0;
+  --cd: #f0e9de;
+  --td: #1c2b1e;
+  --tm: #4a5e4e;
+  --tl: #7a9480;
+  --wh: #ffffff;
+  --err: #c0392b;
+  --ok: #2d5a3d;
+}
+
 .register-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: #F5F5DC;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gd) 0%, var(--gm) 55%, #3d7a52 100%);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Jost', sans-serif;
+}
+
+.register-leaf {
+  position: absolute;
+  font-size: 120px;
+  opacity: 0.06;
+  pointer-events: none;
+  animation: floatL 9s ease-in-out infinite;
+}
+.register-leaf:nth-child(1) { top: -20px; right: 40px; animation-delay: 0s; }
+.register-leaf:nth-child(2) { bottom: 40px; left: -20px; font-size: 80px; animation-delay: 3s; }
+.register-leaf:nth-child(3) { top: 50%; right: -30px; font-size: 90px; animation-delay: 6s; }
+
+@keyframes floatL {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-16px) rotate(8deg); }
 }
 
 .register-card {
-  background: white;
-  padding: 40px;
-  width: 350px;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  background: var(--cr);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.register-card-top {
+  background: linear-gradient(135deg, var(--gd), var(--gm));
+  padding: 32px 36px 28px;
   text-align: center;
 }
-
-.register-card h2 {
-  margin-bottom: 20px;
-  color: #2E7D32;
-}
-
-.register-card input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-.register-card button {
-  width: 100%;
-  padding: 10px;
-  background-color: #2E7D32;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.register-card button:hover {
-  background-color: #1b5e20;
-}
-
-.error {
-  color: red;
+.register-logo {
+  font-size: 2.2rem;
   margin-bottom: 10px;
 }
-
-/* Mobile Responsive  */
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  font-size: 16px;
+.register-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--wh);
+  margin: 0 0 4px;
+}
+.register-subtitle {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.06em;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
+.register-body {
+  padding: 32px 36px 36px;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  .login-card, .register-card, .cart-container {
-    padding: 20px;
-    margin: 10px;
-  }
+.register-error {
+  background: #fff5f5;
+  border: 1px solid rgba(192,57,43,0.25);
+  color: var(--err);
+  font-size: 0.83rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  h2 {
-    font-size: 20px;
-  }
+.register-success {
+  background: var(--gp);
+  border: 1px solid rgba(74,140,92,0.3);
+  color: var(--ok);
+  font-size: 0.83rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.register-field { margin-bottom: 16px; }
+.register-label {
+  display: block;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--gd);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.register-input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid rgba(26,58,42,0.15);
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  color: var(--td);
+  background: var(--wh);
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  box-sizing: border-box;
+}
+.register-input:focus {
+  border-color: var(--gf);
+  box-shadow: 0 0 0 3px rgba(74,140,92,0.12);
+}
+
+.register-btn-wrap {
+  position: relative;
+  width: 50%;
+  height: 40px;
+  margin: 8px auto 4px;
+}
+
+.register-btn {
+  width: 100%;
+  height: 100%;
+  background: var(--gd);
+  color: var(--wh);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 600;
+  font-size: 0.97rem;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: background 0.25s ease, transform 0.12s ease;
+}
+.register-btn:hover { 
+  background: var(--gm); 
+  transform: translateY(-1px); 
+}
+.register-btn:disabled { 
+  opacity: 0.65; 
+  cursor: not-allowed; 
+}
+
+.register-login {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(26,58,42,0.08);
+  font-size: 0.87rem;
+  color: var(--tm);
+}
+.register-login a {
+  color: var(--gf);
+  font-weight: 600;
+  text-decoration: none;
+}
+.register-login a:hover { color: var(--gd); }
+
+@media (max-width: 480px) {
+  .register-card-top { padding: 24px 24px 20px; }
+  .register-body     { padding: 24px 24px 28px; }
+  .register-title    { font-size: 1.5rem; }
 }

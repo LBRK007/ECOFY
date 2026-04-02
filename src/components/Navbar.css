@@ -21,7 +21,7 @@
   height: var(--nav-height);
   background: var(--nav-bg);
   border-bottom: 1px solid var(--nav-border);
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 1000;
   transition: background 0.3s ease, box-shadow 0.3s ease;
@@ -81,6 +81,18 @@
 }
 .cart-btn:hover { color: #fff; border-color: var(--nav-accent); }
 
+.cart-icon {
+  font-size: 1.2rem;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.cart-count {
+  font-weight: 600;
+  color: var(--gf);
+  margin-left: 2px;
+}
+
 /* ── Center Logo ── */
 .nav-center {
   position: absolute;
@@ -88,29 +100,37 @@
   transform: translateX(-50%);
   display: flex;
   align-items: center;
+  pointer-events: none; /* disable clicks by default */
 }
 
+.logo-click-area {
+  pointer-events: auto; /* re-enable only inside navbar bounds */
+}
+
+/* Optional: prevent overflow clicks */
 .nav-logo {
-  height: 350px;
-  width: auto;
-  cursor: pointer;
-  object-fit: contain;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-}
-
-.nav-logo:hover {
-  transform: scale(1.06);
-  opacity: 0.92;
+  display: block;
+  height: 385px;
 }
 
 /* ── Dropdown ── */
 .account-container { position: relative; }
 
+.account-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.account-icon {
+  font-size: 1.2rem;
+  vertical-align: middle;
+}
+
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+  top: calc(100% + 1px);
+  right: -25px;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 12px 40px rgba(26, 58, 42, 0.18);
@@ -148,7 +168,7 @@
 @media (max-width: 768px) {
   .navbar {
     justify-content: center;
-    height: 56px;
+    height: 50px;
     padding: 0 20px;
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -165,7 +185,7 @@
   }
 
 .nav-logo {
-  height: 350px;
+  height: 280px;
   width: auto;
   cursor: pointer;
 

@@ -3,7 +3,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { CartContext } from "../context/CartContext";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import HeartButton from "../components/HeartButton";
 import "./Products.css";
@@ -15,7 +14,6 @@ function Products() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { addToCart } = useContext(CartContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -24,7 +22,6 @@ function Products() {
         const list = productSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         setProducts(list);
 
-        // Fetch all reviews in one shot, group by productId
         const reviewSnap = await getDocs(collection(db, "reviews"));
         const grouped = {};
         reviewSnap.docs.forEach((d) => {
@@ -32,6 +29,7 @@ function Products() {
           if (!grouped[productId]) grouped[productId] = [];
           grouped[productId].push(rating);
         });
+
         const ratingMap = {};
         Object.entries(grouped).forEach(([pid, ratingList]) => {
           ratingMap[pid] = {
@@ -55,103 +53,105 @@ function Products() {
   );
 
   if (loading) {
-    return <div className="products-container"><h2>Loading products...</h2></div>;
+    return (
+      <div className="products-container">
+        <div className="loading">Curating our natural collection...</div>
+      </div>
+    );
   }
 
   return (
     <motion.div
       className="products-container"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -40 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
     >
-      <h1>Our Natural Products 🌿</h1>
+      <div className="header">
+        <h1>Our Natural Collection</h1>
+        <p className="subtitle">Thoughtfully sourced • Sustainably crafted • Kind to you and the planet</p>
+      </div>
 
-      {/* Search */}
-      <div style={{ maxWidth: "420px", margin: "0 auto 30px" }}>
+      <div className="search-wrapper">
         <input
           type="text"
           placeholder="Search products..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px 18px",
-            borderRadius: "25px",
-            border: "1.5px solid #c8e6c9",
-            fontSize: "15px",
-            outline: "none",
-            boxSizing: "border-box",
-            boxShadow: "0 2px 8px rgba(46,125,50,0.08)",
-          }}
+          className="search-input"
         />
       </div>
 
       {filtered.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#888", marginTop: "40px" }}>
-          No products match "{searchQuery}"
-        </p>
+        <p className="no-results">No products found for "{searchQuery}"</p>
       ) : (
         <div className="product-grid">
           {filtered.map((product, index) => {
             const stock = product.stock ?? 0;
-            const productRating = ratings[product.id];
+            const ratingData = ratings[product.id];
 
             return (
               <motion.div
                 key={product.id}
                 className="product-card"
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.08 }}
-                whileHover={{ scale: 1.03 }}
-                onClick={() => navigate(`/products/${product.id}`)}
-                style={{ cursor: "pointer", position: "relative" }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -8 }}
               >
-                {/* ── Heart button — top-right of the image ── */}
-                <div style={{ position: "relative" }}>
-                  <img src={product.image} alt={product.name} />
-                  <div style={{ position: "absolute", top: "8px", right: "8px" }}>
-                    <HeartButton
-                      productId={product.id}
-                      size={22}
-                      style={{
-                        background: "rgba(255,255,255,0.85)",
-                        borderRadius: "50%",
-                        padding: "5px",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.12)",
+                <div className="card-image">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    loading="lazy"
+                  />
+
+                  {/* Badges */}
+                  {product.badge && (
+                    <div className="badge">{product.badge}</div>
+                  )}
+
+                  {/* Wishlist */}
+                  <div className="wishlist-btn">
+                    <HeartButton productId={product.id} size={22} />
+                  </div>
+
+                  {/* Hover Overlay */}
+                  <div className="card-overlay">
+                    <button 
+                      className="quick-add-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (stock > 0) addToCart(product);
                       }}
-                    />
+                      disabled={stock === 0}
+                    >
+                      {stock > 0 ? "Add to Cart" : "Out of Stock"}
+                    </button>
                   </div>
                 </div>
 
-                <h3>{product.name}</h3>
-                <p className="price">₹ {product.price}</p>
+                <div className="card-content">
+                  <h3 className="product-name">{product.name}</h3>
+                  
+                  {ratingData ? (
+                    <div className="rating">
+                      <StarRating rating={ratingData.average} size={15} />
+                      <span className="rating-count">({ratingData.count})</span>
+                    </div>
+                  ) : (
+                    <div className="rating no-rating">No reviews yet</div>
+                  )}
 
-                {/* Rating */}
-                {productRating ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px", justifyContent: "center", margin: "4px 0" }}>
-                    <StarRating rating={productRating.average} size={14} />
-                    <span style={{ fontSize: "12px", color: "#888" }}>({productRating.count})</span>
+                  <div className="price-row">
+                    <span className="price">₹{product.price}</span>
+                    {stock > 0 ? (
+                      <span className="stock in-stock">In stock</span>
+                    ) : (
+                      <span className="stock out-stock">Out of stock</span>
+                    )}
                   </div>
-                ) : (
-                  <p style={{ fontSize: "12px", color: "#ccc", margin: "4px 0" }}>No reviews yet</p>
-                )}
-
-                <p className={`stock-text ${stock > 0 ? "in-stock" : "out-stock"}`}>
-                  {stock > 0 ? `In Stock: ${stock}` : "Out of Stock"}
-                </p>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (stock > 0) addToCart(product);
-                  }}
-                  disabled={stock === 0}
-                >
-                  {stock > 0 ? "Add to Cart" : "Out of Stock"}
-                </button>
+                </div>
               </motion.div>
             );
           })}
@@ -161,4 +161,4 @@ function Products() {
   );
 }
 
-export default Products;  
+export default Products;
