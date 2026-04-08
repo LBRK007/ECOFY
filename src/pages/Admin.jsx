@@ -105,7 +105,7 @@ useEffect(() => {
       {/* ── Header ── */}
       <div style={styles.header}>
         <div>
-          <h1 style={{ margin: 0 }}>Admin Dashboard 🌿</h1>
+          <h1 style={{ margin: 0 }}>Admin Dashboard</h1>
           <div style={styles.liveIndicator}>
             <span style={styles.liveDot} />
             Live updates active
@@ -117,6 +117,9 @@ useEffect(() => {
           </button>
           <button onClick={() => navigate("/completed-orders")} style={styles.btnBlue}>
             Completed Orders
+          </button>
+          <button onClick={() => navigate("/active-orders")} style={styles.btnOrange}>
+          Active Orders
           </button>
         </div>
       </div>
@@ -147,83 +150,6 @@ useEffect(() => {
 
       {/* ── Analytics Chart ── */}
       <OrdersChart orders={activeOrders} allOrders={allOrders} />
-
-      {/* ── Active Orders table ── */}
-      <h2 style={{ marginBottom: "20px" }}>Active Orders</h2>
-
-      {activeOrders.length === 0 ? (
-        <p style={{ color: "#888" }}>No active orders right now.</p>
-      ) : (
-        activeOrders.map((order) => (
-          <motion.div
-            key={order.id}
-            layout
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={styles.orderCard}
-          >
-            <div style={styles.orderTop}>
-              <div>
-                <p style={{ margin: "0 0 4px" }}>
-                  <strong>User:</strong> {order.userEmail}
-                </p>
-                <p style={{ margin: "0 0 4px" }}>
-                  <strong>Total:</strong> ₹ {order.total}
-                </p>
-                <p style={{ margin: 0, fontSize: "13px", color: "#888" }}>
-                  {order.createdAt?.toDate().toLocaleString()}
-                </p>
-              </div>
-              <StatusBadge status={order.status || "Pending"} />
-            </div>
-
-            {/* Shipping */}
-            <div style={styles.shippingBox}>
-              <p style={{ margin: "0 0 4px", fontWeight: "500", fontSize: "13px" }}>
-                Shipping details
-              </p>
-              <p style={styles.shippingText}>{order.shipping?.fullName}</p>
-              <p style={styles.shippingText}>{order.shipping?.address}</p>
-              <p style={styles.shippingText}>
-                {order.shipping?.city}, {order.shipping?.state} — {order.shipping?.pin}
-              </p>
-              <p style={styles.shippingText}>📞 {order.shipping?.phone}</p>
-            </div>
-
-            {/* Items */}
-            <div style={{ marginTop: "12px" }}>
-              <p style={{ margin: "0 0 6px", fontWeight: "500", fontSize: "13px" }}>Items</p>
-              {order.items?.map((item, idx) => (
-                <div key={idx} style={styles.itemRow}>
-                  <span>{item.name}</span>
-                  <span style={{ color: "#888" }}>× {item.quantity}</span>
-                  <span style={{ marginLeft: "auto", color: "#2E7D32", fontWeight: "500" }}>
-                    ₹ {item.price * item.quantity}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Status dropdown */}
-            <div style={{ marginTop: "14px", display: "flex", alignItems: "center", gap: "10px" }}>
-              <select
-                value={order.status || "Pending"}
-                onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                disabled={updatingId === order.id}
-                style={styles.select}
-              >
-                <option value="Pending">Pending</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-              {updatingId === order.id && (
-                <span style={{ fontSize: "13px", color: "#888" }}>Saving...</span>
-              )}
-            </div>
-          </motion.div>
-        ))
-      )}
 
       <style>{`
         @keyframes pulse {
@@ -339,6 +265,15 @@ const styles = {
     cursor: "pointer",
     fontWeight: "500",
   },
+  btnOrange: {
+  padding: "10px 16px",
+  backgroundColor: "#FF9800",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "500",
+},
 };
 
 export default Admin;

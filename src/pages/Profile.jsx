@@ -241,7 +241,7 @@ function Profile() {
           </nav>
 
           <button onClick={handleLogout} className="signout-btn">
-            Sign out
+            Logout
           </button>
         </div>
 
@@ -292,7 +292,7 @@ function Profile() {
               </div>
 
               <button onClick={() => setShowEditModal(true)} className="edit-btn">
-                Edit Personal Information
+                Edit
               </button>
             </div>
           )}

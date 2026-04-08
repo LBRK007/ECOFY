@@ -562,10 +562,10 @@ function AdminProducts() {
             </div>
 
             {/* Image upload */}
-            <div style={S.fieldGroup}>
-              <label style={S.label}>Product Image {editingId && "(optional)"}</label>
+            <label style={S.label}>Product Image {editingId && "(optional)"}</label>
+            <div style={{...S.fieldGroup, marginLeft: "200px" }}>
               <label style={S.fileZone}>
-                {imageFile ? `📎 ${imageFile.name}` : "🌿 Click to upload image"}
+                {imageFile ? `📎 ${imageFile.name}` : "upload image"}
                 <input
                   type="file"
                   accept="image/*"
@@ -770,12 +770,12 @@ function AdminProducts() {
                 style={{ ...(editingId ? S.btnEdit : S.btnPrimary), opacity: submitting ? 0.7 : 1 }}
               >
                 {submitting
-                  ? "🌿 Saving..."
+                  ? "Saving..."
                   : editingId
-                    ? "✅ Update Product"
+                    ? "Update Product"
                     : timeLimitOn
-                      ? "⏳ Add Limited-Time Product"
-                      : "🪴 Add Product"}
+                      ? "Add Limited-Time Product"
+                      : "Add Product"}
               </button>
               {editingId && (
                 <button type="button" onClick={resetForm} style={S.btnCancel}>
@@ -923,7 +923,7 @@ function ProductCard({ product, onEdit, onDelete, onExpired }) {
         )}
 
         <div style={S.cardActions}>
-          <button style={S.btnCardEdit} onClick={onEdit}>✏️ Edit</button>
+          <button style={S.btnCardEdit} onClick={onEdit}>Edit</button>
           <button style={S.btnCardDel}  onClick={onDelete}>🗑 Delete</button>
         </div>
       </div>

@@ -43,3 +43,127 @@ a:focus-visible {
     font-size: 16px; /* Prevents zoom on iOS */
   }
 }
+
+/* =========================
+   Tailwind Utilities & Custom Styles
+   For Cart & Checkout Pages
+========================= */
+
+/* Container for center alignment and padding */
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Typography */
+.text-muted-foreground {
+  @apply text-gray-500;
+}
+
+.text-foreground {
+  @apply text-gray-900;
+}
+
+/* Buttons */
+.btn {
+  @apply bg-green-600 text-white font-medium uppercase tracking-wider py-3 px-4 rounded shadow-sm hover:bg-green-700 transition-colors w-full;
+}
+
+.btn-outline {
+  @apply border border-gray-900 text-gray-900 font-medium uppercase tracking-wider py-3 px-4 rounded hover:bg-gray-900 hover:text-white transition-colors w-full;
+}
+
+/* Input fields */
+.input {
+  @apply w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition;
+}
+
+/* Flex utilities */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+/* Grid utilities */
+.grid-cols-2-gap-3 {
+  @apply grid grid-cols-2 gap-3;
+}
+
+/* Cards and sections */
+.card {
+  @apply bg-white rounded-lg shadow p-6;
+}
+
+.summary-card {
+  @apply bg-gray-50 rounded-lg p-6 border border-gray-200;
+}
+
+/* Quantity buttons in cart */
+.qty-btn {
+  @apply w-8 h-8 flex items-center justify-center border border-gray-300 rounded cursor-pointer text-gray-700 hover:bg-gray-200 transition;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+/* Order confirmation icon */
+.order-confirm-icon {
+  @apply w-12 h-12 rounded-full bg-green-600 flex items-center justify-center mx-auto mb-6;
+}
+
+/* Text helpers */
+.text-sm {
+  @apply text-sm;
+}
+
+.text-xs {
+  @apply text-xs;
+}
+
+.text-lg {
+  @apply text-lg font-medium;
+}
+
+.font-light {
+  @apply font-light;
+}
+
+/* Margin & spacing helpers */
+.mb-2 { @apply mb-2; }
+.mb-4 { @apply mb-4; }
+.mb-6 { @apply mb-6; }
+.mb-8 { @apply mb-8; }
+.mt-2 { @apply mt-2; }
+.pt-4 { @apply pt-4; }
+.pt-6 { @apply pt-6; }
+.space-y-3 > :not([hidden]) ~ :not([hidden]) { @apply mt-0.75rem; }
+.space-y-4 > :not([hidden]) ~ :not([hidden]) { @apply mt-1rem; }
+.space-y-6 > :not([hidden]) ~ :not([hidden]) { @apply mt-1.5rem; }
+
+/* Border top helper */
+.border-t {
+  @apply border-t border-gray-200;
+}
+
+/* Summary section */
+.summary-row {
+  @apply flex justify-between text-sm;
+}
+.summary-total {
+  @apply flex justify-between font-medium pt-4 border-t border-gray-200;
+}
+
+/* Responsive images in cart */
+.cart-image {
+  @apply w-24 h-32 object-cover bg-gray-100 rounded;
+}
+
+/* Checkout input grid */
+.checkout-grid {
+  @apply grid grid-cols-2 gap-3;
+}

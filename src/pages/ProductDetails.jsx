@@ -9,193 +9,253 @@ import StarRating from "../components/StarRating";
 import HeartButton from "../components/HeartButton";
 import { useWishlist } from "../context/WishlistContext";
 import { useToast } from "../hooks/useToast";
+import "./ProductDetails.css";
+
+const ECO_FEATURES = [
+  "100% natural & sustainably sourced bamboo",
+  "Biodegradable and plastic-free",
+  "Gentle on skin and the environment",
+  "Ethically manufactured",
+];
 
 function ProductDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { addToCart } = useContext(CartContext);
+  const { id }       = useParams();
+  const navigate     = useNavigate();
+  const { addToCart }                        = useContext(CartContext);
   const { isWishlisted, toggleWishlist, user } = useWishlist();
-  const { toast, ToastContainer } = useToast();
+  const { toast, ToastContainer }            = useToast();
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [product,     setProduct]     = useState(null);
+  const [loading,     setLoading]     = useState(true);
   const [reviewStats, setReviewStats] = useState({ average: 0, count: 0 });
+  const [cartAdded,   setCartAdded]   = useState(false);
+
+  // ✅ NEW: timer state
+  const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetch = async () => {
       try {
-        const docRef = doc(db, "products", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) setProduct({ id: docSnap.id, ...docSnap.data() });
+        const snap = await getDoc(doc(db, "products", id));
+        if (snap.exists()) setProduct({ id: snap.id, ...snap.data() });
       } catch (err) {
-        console.error("Error fetching product:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProduct();
+    fetch();
   }, [id]);
 
-  const handleWishlistToggle = async () => {
+  // ✅ NEW: countdown logic
+  useEffect(() => {
+    if (!product?.expiresAt) return;
+
+    const interval = setInterval(() => {
+      const diff = new Date(product.expiresAt).getTime() - Date.now();
+
+      if (diff <= 0) {
+        setTimeLeft("");
+        clearInterval(interval);
+      } else {
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+
+        if (h > 0) {
+          setTimeLeft(`${h}h ${m}m`);
+        } else {
+          setTimeLeft(`${m}m ${s}s`);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [product]);
+
+  const handleWishlist = async () => {
     if (!user) { navigate("/login"); return; }
     const added = await toggleWishlist(id);
-    toast(
-      added ? "Added to wishlist 🤍" : "Removed from wishlist",
-      added ? "success" : "info"
-    );
+    toast(added ? "Added to wishlist 🤍" : "Removed from wishlist", added ? "success" : "info");
   };
 
-  if (loading) return <h2 style={{ padding: "50px" }}>Loading product...</h2>;
-  if (!product) return <h2 style={{ padding: "50px" }}>Product not found ❌</h2>;
+  const handleAddToCart = () => {
+    if (!product || stock === 0) return;
+    addToCart(product);
+    setCartAdded(true);
+    setTimeout(() => setCartAdded(false), 1800);
+  };
 
-  const stock = product.stock ?? 0;
+  /* ── Loading ── */
+  if (loading) return (
+    <div className="pd-loading">
+      <div className="pd-spinner" />
+      <span>Loading product…</span>
+    </div>
+  );
+
+  if (!product) return (
+    <div className="pd-not-found">
+      <div style={{ fontSize: "3rem", marginBottom: "16px" }}>🌱</div>
+      <h2>Product not found</h2>
+      <p>We couldn't locate the item you're looking for.</p>
+      <button
+        onClick={() => navigate("/products")}
+        style={{ marginTop: "24px", padding: "12px 28px", background: "#1a3a2a", color: "#fff", border: "none", borderRadius: "100px", cursor: "pointer", fontFamily: "'Jost',sans-serif", fontWeight: 600 }}
+      >
+        Back to Products
+      </button>
+    </div>
+  );
+
+  const stock      = product.stock ?? 0;
   const wishlisted = isWishlisted(id);
+
+  const stockInfo = stock > 5
+    ? { cls: "pd-stock-high", text: `In Stock (${stock} available)` }
+    : stock > 0
+    ? { cls: "pd-stock-low",  text: `Only ${stock} left!` }
+    : { cls: "pd-stock-out",  text: "Out of Stock" };
 
   return (
     <motion.div
-      style={{ padding: "60px", maxWidth: "1000px", margin: "0 auto" }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="pd-page"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45 }}
     >
       <ToastContainer />
 
-      {/* ── Product section ── */}
-      <div style={{ display: "flex", gap: "60px", alignItems: "flex-start", flexWrap: "wrap" }}>
-        {/* Image */}
-        <div style={{ position: "relative" }}>
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{
-              width: "380px",
-              maxWidth: "100%",
-              borderRadius: "16px",
-              boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
-          {/* Heart on image corner */}
-          <div style={{ position: "absolute", top: "12px", right: "12px" }}>
-            <HeartButton
-              productId={id}
-              size={24}
-              style={{
-                background: "rgba(255,255,255,0.9)",
-                borderRadius: "50%",
-                padding: "6px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
-            />
+      <button className="pd-back" onClick={() => navigate("/products")}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        Back to Products
+      </button>
+
+      <div className="pd-grid">
+
+        <motion.div
+          className="pd-image-wrap"
+          initial={{ opacity: 0, x: -24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+        >
+          <div className="pd-image-main">
+            <img src={product.image} alt={product.name} />
+            <button className="pd-heart" onClick={handleWishlist}>
+              <HeartButton productId={id} size={22} />
+            </button>
           </div>
-        </div>
 
-        {/* Details */}
-        <div style={{ flex: 1, minWidth: "260px" }}>
-          <h1 style={{ margin: "0 0 10px" }}>{product.name}</h1>
+          <div className="pd-eco-strip">
+            <span className="pd-eco-pill">🌿 Eco-Friendly</span>
+            <span className="pd-eco-pill">🎋 Bamboo</span>
+            <span className="pd-eco-pill">♻️ Biodegradable</span>
+          </div>
+        </motion.div>
 
-          {/* Rating */}
+        <motion.div
+          className="pd-details"
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+        >
+          <div className="pd-tag">🪴 ECOFY Collection</div>
+
+          <h1 className="pd-name">{product.name}</h1>
+
           {reviewStats.count > 0 ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
-              <StarRating rating={reviewStats.average} size={20} />
-              <span style={{ fontSize: "15px", color: "#555" }}>
-                {reviewStats.average.toFixed(1)}
-              </span>
-              <span style={{ fontSize: "14px", color: "#aaa" }}>
+            <div className="pd-rating">
+              <StarRating rating={reviewStats.average} size={17} />
+              <span className="pd-rating-num">{reviewStats.average.toFixed(1)}</span>
+              <span className="pd-rating-count">
                 ({reviewStats.count} {reviewStats.count === 1 ? "review" : "reviews"})
               </span>
             </div>
           ) : (
-            <p style={{ fontSize: "13px", color: "#bbb", marginBottom: "14px" }}>No reviews yet</p>
+            <p className="pd-no-rating">No reviews yet — be the first!</p>
           )}
 
-          <h2 style={{ color: "#2E7D32", margin: "0 0 16px" }}>₹ {product.price}</h2>
+          <div className="pd-divider" />
 
-          <p style={{ lineHeight: "1.7", color: "#555", marginBottom: "20px" }}>
-            {product.description || "100% natural and eco-friendly product made with love 🌿"}
+          <div className="pd-price">₹{product.price?.toLocaleString()}</div>
+
+          {/* ✅ TIME LIMIT DISPLAY */}
+          {timeLeft && (
+            <div className="pd-timer">
+              ⏳ {timeLeft} left
+            </div>
+          )}
+
+          <p className="pd-desc">
+            {product.description ||
+              "100% natural and eco-friendly product made with care. Designed to bring a touch of nature into your daily routine while reducing your plastic footprint."}
           </p>
 
-          {/* Stock */}
-          <p style={{
-            fontWeight: "500",
-            marginBottom: "24px",
-            color: stock > 5 ? "#2E7D32" : stock > 0 ? "#e65100" : "#c62828",
-          }}>
-            {stock > 5 ? `In Stock (${stock})` : stock > 0 ? `Only ${stock} left ⚠` : "Out of Stock ❌"}
-          </p>
+          <div>
+            <span className={`pd-stock ${stockInfo.cls}`}>
+              <span className="pd-stock-dot" />
+              {stockInfo.text}
+            </span>
+          </div>
 
-          {/* ── Action buttons row ── */}
-          <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-            <button
-              onClick={() => addToCart(product)}
+          <div className="pd-divider" />
+
+          <div className="pd-features">
+            {ECO_FEATURES.map((f, i) => (
+              <div className="pd-feature" key={i}>
+                <span className="pd-feature-dot" />
+                {f}
+              </div>
+            ))}
+          </div>
+
+          <div className="pd-actions">
+            <motion.button
+              className={`pd-btn-cart${cartAdded ? " added" : ""}`}
+              whileHover={stock > 0 ? { scale: 1.02 } : {}}
+              whileTap={stock > 0 ? { scale: 0.97 } : {}}
+              onClick={handleAddToCart}
               disabled={stock === 0}
-              style={{
-                padding: "12px 26px",
-                backgroundColor: stock === 0 ? "#ccc" : "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                cursor: stock === 0 ? "not-allowed" : "pointer",
-                fontSize: "16px",
-                fontWeight: "500",
-              }}
             >
-              {stock === 0 ? "Out of Stock" : "Add to Cart"}
-            </button>
+              {cartAdded ? "✓ Added!" : stock === 0 ? "Out of Stock" : "Add to Cart"}
+            </motion.button>
 
             {stock > 0 && (
-              <button
+              <motion.button
+                className="pd-btn-buy"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => { addToCart(product); navigate("/cart"); }}
-                style={{
-                  padding: "12px 26px",
-                  backgroundColor: "#1a1a1a",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                  fontWeight: "500",
-                }}
               >
-                Buy Now
-              </button>
+               Buy Now
+              </motion.button>
             )}
 
-            {/* ── Standalone wishlist button with label ── */}
-            <button
-              onClick={handleWishlistToggle}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                padding: "11px 18px",
-                background: wishlisted ? "#fff0f0" : "#f5f5f5",
-                color: wishlisted ? "#e53935" : "#555",
-                border: `1px solid ${wishlisted ? "#ffcdd2" : "#ddd"}`,
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "15px",
-                fontWeight: "500",
-                transition: "all 0.2s",
-              }}
+            <motion.button
+              className={`pd-btn-wish${wishlisted ? " wishlisted" : ""}`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleWishlist}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24"
-                fill={wishlisted ? "#e53935" : "none"}
-                stroke={wishlisted ? "#e53935" : "#888"}
-                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-              >
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-              {wishlisted ? "Wishlisted" : "Save to Wishlist"}
-            </button>
+              {wishlisted ? "Saved" : "Save"}
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* ── Reviews ── */}
-      <div style={{ marginTop: "60px", borderTop: "1px solid #eee", paddingTop: "20px" }}>
+      <motion.div
+        className="pd-reviews"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="pd-reviews-title">Customer Reviews</h2>
         <Reviews productId={id} onStatsChange={setReviewStats} />
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

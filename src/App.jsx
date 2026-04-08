@@ -7,6 +7,7 @@ import Products from "./pages/Products";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Admin from "./pages/Admin";
 import AdminProducts from "./pages/AdminProducts";
 import ProductDetails from "./pages/ProductDetails";
@@ -14,6 +15,11 @@ import CompletedOrders from "./pages/CompletedOrders";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
+import ActiveOrders from "./pages/ActiveOrders";
+import ScrollToTop from "./components/ScrollToTop";
+import { WishlistProvider } from "./context/WishlistContext";
+
+
 
 
 function AnimatedRoutes() {
@@ -28,6 +34,7 @@ function AnimatedRoutes() {
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        
 
         {/* 🔐 Protected User Route */}
         <Route
@@ -75,6 +82,15 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/active-orders"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <ActiveOrders />
+            </ProtectedRoute>
+          }
+        />
+         <Route path="/checkout" element={<Checkout />} />
 
       </Routes>
     </AnimatePresence>
@@ -84,13 +100,31 @@ function AnimatedRoutes() {
 function App() {
   return (
     <Router>
+      <WishlistProvider> 
       <Navbar />
+      <ScrollToTop />
+      <MainContent />
+      <BottomNav />
+      </WishlistProvider>
+    </Router>
+  );
+}
+
+function MainContent() {
+  const location = useLocation();
+
+  // List of routes where you want the footer to show
+  const footerRoutes = ['/', '/products', '/profile',];
+
+  return (
+    <>
       <main style={{ paddingTop: '70px' }}>
         <AnimatedRoutes />
       </main>
-      <BottomNav />
-      <Footer />
-    </Router>
+      
+      {/* Render footer only on specific routes */}
+      {footerRoutes.includes(location.pathname) && <Footer />}
+    </>
   );
 }
 
