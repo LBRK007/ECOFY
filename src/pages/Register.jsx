@@ -74,7 +74,7 @@ function Register() {
               <input
                 className="register-input"
                 type="email"
-                placeholder="you@gmail.com"
+                placeholder="example@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

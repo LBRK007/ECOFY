@@ -164,3 +164,4 @@ export function WishlistProvider({ children }) {
     </WishlistContext.Provider>
   );
 }
+

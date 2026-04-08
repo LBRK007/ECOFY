@@ -26,7 +26,7 @@ function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate(email === ADMIN_EMAIL ? "/admin" : "/");
     } catch {
-      setError("Invalid email or password ❌");
+      setError("Invalid email or password ");
     }
 
     setLoading(false);
@@ -73,7 +73,7 @@ function Login() {
 
         {/* ── Form ── */}
         <div className="login-body">
-          {error   && <div className="login-error">   ❌ {error}   </div>}
+          {error   && <div className="login-error">    {error}   </div>}
           {message && <div className="login-success"> ✅ {message} </div>}
 
           <form onSubmit={handleLogin}>
@@ -82,7 +82,7 @@ function Login() {
               <input
                 className="login-input"
                 type="email"
-                placeholder="you@gmail.com"
+                placeholder="example@gmail.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -108,7 +108,7 @@ function Login() {
                 disabled={loading}
                 className="login-btn"
               >
-                {loading ? "🌿 Logging in..." : "Login"}
+                {loading ? "Logging in..." : "Login"}
               </button>
             </div>
           </form>

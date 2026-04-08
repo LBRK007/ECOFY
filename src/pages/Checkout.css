@@ -1,0 +1,102 @@
+/* ── Progress track ── */
+.co-progress-track {
+  height: 6px;
+  background: #e8f0ea;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.co-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2d5a3d, #4a8c5c);
+  border-radius: 100px;
+}
+
+/* ── Stage list ── */
+.co-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.co-stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  transition: color 0.25s;
+}
+.co-stage.pending { color: #bbb; }
+.co-stage.active  { color: #1a3a2a; font-weight: 600; }
+.co-stage.done    { color: #4a8c5c; }
+
+.co-stage-dot {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border-radius: 50%;
+  background: #f0f7f2;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+.co-stage.done .co-stage-dot  { background: #e8f5ec; color: #2e7d32; }
+.co-stage.active .co-stage-dot { background: #e8f5ec; }
+
+.co-stage-label { flex: 1; }
+
+.co-current-msg {
+  font-size: 0.82rem;
+  color: #4a5e4e;
+  margin: 0;
+  font-style: italic;
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* ── Spinner keyframe (shared) ── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Success order summary ── */
+.success-order-summary {
+  background: #f8fbf7;
+  border: 1px solid rgba(26,58,42,0.1);
+  border-radius: 16px;
+  padding: 18px 22px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.success-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: #3a4e3e;
+}
+.success-item img {
+  width: 44px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #e8f5ec;
+  flex-shrink: 0;
+}
+.success-item span:last-child {
+  margin-left: auto;
+  font-weight: 600;
+  color: #4a8c5c;
+}
+.success-total {
+  padding-top: 10px;
+  border-top: 1px solid rgba(26,58,42,0.1);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a3a2a;
+  text-align: right;
+}

@@ -14,13 +14,15 @@ function ActiveOrders() {
   const { toast, ToastContainer } = useToast();
   const navigate = useNavigate();
   const unsubscribeRef = useRef(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     const subscribeToOrders = () => {
       if (unsubscribeRef.current) unsubscribeRef.current();
 
-      const q = query(collection(db, "orders"), orderBy("createdAt", "asc"));
+      const q = query(collection(db, "orders"), orderBy("createdAt", sortOrder));
 
+     
       const unsubscribe = onSnapshot(
         q,
         (snapshot) => {
@@ -50,7 +52,7 @@ function ActiveOrders() {
       unsubscribeAuth();
       if (unsubscribeRef.current) unsubscribeRef.current();
     };
-  }, [navigate, toast]);
+  }, [navigate, toast, sortOrder]);
 
   const handleStatusChange = async (orderId, newStatus) => {
     setUpdatingId(orderId);
@@ -71,6 +73,18 @@ function ActiveOrders() {
       exit={{ opacity: 0 }}
       style={{ padding: "40px", background: "#f4f6f8", minHeight: "100vh" }}
     >
+      <div style={{ marginBottom: "20px" }}>
+  <label htmlFor="sortOrder" style={{ marginRight: "10px" }}>Sort by date:</label>
+  <select
+    id="sortOrder"
+    value={sortOrder}
+    onChange={(e) => setSortOrder(e.target.value)}
+    style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #ddd" }}
+  >
+    <option value="asc">Oldest first</option>
+    <option value="desc">Newest first</option>
+  </select>
+</div>
       <ToastContainer />
       <h1>Active Orders</h1>
       {activeOrders.length === 0 ? (
