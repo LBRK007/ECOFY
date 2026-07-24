@@ -4,8 +4,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   onSnapshot,
-  updateDoc,
-  doc,
   query,
   orderBy,
 } from "firebase/firestore";
@@ -19,7 +17,6 @@ function Admin() {
   const [allOrders, setAllOrders]   = useState([]); // every order (for chart + completed count)
   const [activeOrders, setActiveOrders] = useState([]); // non-Delivered (for the orders table)
   const [loading, setLoading]       = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
   const { toast, ToastContainer }   = useToast();
   const navigate = useNavigate();
   const unsubscribeSnapshotRef      = useRef(null);
@@ -65,27 +62,6 @@ useEffect(() => {
   };
 }, [navigate, toast]);
 
-  /* ── Update order status ── */
-  const handleStatusChange = async (orderId, newStatus) => {
-    setUpdatingId(orderId);
-    try {
-      await updateDoc(doc(db, "orders", orderId), { status: newStatus });
-      // onSnapshot handles the re-render automatically
-      toast("Status updated ✅", "success");
-    } catch (err) {
-      console.error("Update error:", err);
-      toast("Failed to update status.", "error");
-    }
-    setUpdatingId(null);
-  };
-
-  if (loading) {
-    return (
-      <div style={{ padding: "40px" }}>
-        <h2>Connecting to live dashboard...</h2>
-      </div>
-    );
-  }
 
   /* Revenue: exclude cancelled */
   const activeRevenue = allOrders
