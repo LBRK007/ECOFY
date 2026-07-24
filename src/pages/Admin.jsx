@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   onSnapshot,
+
   query,
   orderBy,
 } from "firebase/firestore";
@@ -62,6 +63,15 @@ useEffect(() => {
   };
 }, [navigate, toast]);
 
+
+
+  if (loading) {
+    return (
+      <div style={{ padding: "40px" }}>
+        <h2>Connecting to live dashboard...</h2>
+      </div>
+    );
+  }
 
   /* Revenue: exclude cancelled */
   const activeRevenue = allOrders
