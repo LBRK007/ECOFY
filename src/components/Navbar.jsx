@@ -67,9 +67,11 @@ function Navbar() {
       {/* ── CENTER LOGO ── */}
       <div className="nav-center">
         <div className="logo-click-area">
+          <div className="logo-wrapper">
           <Link to="/">
             <img src={logo} alt="ECOFY" className="nav-logo" />
           </Link>
+          </div>
         </div>
       </div>
 
