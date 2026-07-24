@@ -12,7 +12,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ADMIN_EMAIL } from "../constants";
-import StatusBadge from "../components/StatusBadge";
 import { useToast } from "../hooks/useToast";
 import OrdersChart from "../components/OrdersChart";
 
